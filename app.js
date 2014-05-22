@@ -6,7 +6,7 @@ app.set('port', process.env.PORT || 3000);
 /* Force redirect to https */
 app.get('*', function(req, res, next){
 
-	console.log('Request to: '+req.url+' is secure: ' + req.secure);
+	console.log('Request to: '+req.url,' is secure: ' + req.secure, 'is secure2: '+req.protocol, 'headers: ',req.headers);
 
 	if((process.env.NODE_ENV === 'production') && !req.secure){
 		res.redirect('https://ftn.herokuapp.com' + req.url);
