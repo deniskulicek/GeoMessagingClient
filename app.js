@@ -6,7 +6,7 @@ app.use(express.static(__dirname + '/dist'));
 
 /* Force redirect to https */
 app.get('*', function(req, res, next){
-	if((process.env.NODE_ENV === 'production') && (req.headers['x-forwarded-proto']!=='https')){
+	if((process.env.NODE_ENV === 'production') && !req.secure){
 		res.redirect('https://ftn.herokuapp.com' + req.url);
 	} else {
 		next();
