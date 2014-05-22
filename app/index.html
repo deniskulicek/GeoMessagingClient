@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>GeoMessaging Client</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <meta charset="UTF-8">
@@ -25,14 +25,16 @@
     <![endif]-->
     <div class="container">
       <div class="header">
-        <ul class="nav nav-pills pull-right">
+        <h3 class="text-muted">Geo Messaging Client</h3>
+        <ul class="nav nav-justified">
+          <li><a ng-href="#"><span class="glyphicon glyphicon-home"></span> Posts</a></li>
           <li ng-class="{'active':route === 'map'}" class="map"><a ng-href="#map"><span class="glyphicon glyphicon-map-marker"></span> Map</a></li>
           <li ng-class="{'active':route === 'map'}" class="new"><a ng-href="#newPost"><span class="glyphicon glyphicon-pushpin"></span> Create post</a></li>
+          <li><a ng-href="#settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
         </ul>
-        <h3 class="text-muted"><a ng-href="#"><span class="glyphicon glyphicon-home"></span> Posts</a></h3>
       </div>
 
-      <div ng-view class="container fancylook"></div>
+      <div ng-view class="fancylook"></div>
 
       <div class="footer">
         <p class="pull-left">BSc Thesis Project</p>
@@ -60,7 +62,7 @@
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
-    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/jquery/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/momentjs/moment.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
@@ -70,6 +72,9 @@
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
+        <script>
+          $("input[type='checkbox']").bootstrapSwitch();
+        </script>
         <!-- endbuild -->
 </body>
 </html>
