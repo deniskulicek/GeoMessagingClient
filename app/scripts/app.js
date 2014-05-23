@@ -23,8 +23,8 @@ app.config(['$routeProvider',
 				templateUrl: 'views/map.html',
 				controller: ''
 			}).
-			when('/newpost', {
-				templateUrl: 'views/newpost.html',
+			when('/new', {
+				templateUrl: 'views/new.html',
 				controller: 'NewPostController'
 			}).
 			when('/settings', {
