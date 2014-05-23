@@ -23,19 +23,20 @@
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-    <div class="container">
+    <div class="container" ng-controller="mainCtrl">
       <div class="header">
-        <h3 class="text-muted">Geo Messaging Client</h3>
-        <ul class="nav nav-justified">
-          <li><a ng-href="#"><span class="glyphicon glyphicon-home"></span> Posts</a></li>
-          <li ng-class="{'active':route === 'map'}" class="map"><a ng-href="#map"><span class="glyphicon glyphicon-map-marker"></span> Map</a></li>
-          <li ng-class="{'active':route === 'map'}" class="new"><a ng-href="#newPost"><span class="glyphicon glyphicon-pushpin"></span> Create post</a></li>
-          <li><a ng-href="#settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+        <h3 class="text-muted">Geo MSG</h3>
+        <ul class="nav nav-justified nav-pills menu">
+          <li ng-class="{'active':route === '/'}" class="posts"><a ng-href="/"><span class="glyphicon glyphicon-home"></span><span class="text"> Posts</span></a></li>
+          <li ng-class="{'active':route === '/map'}" class="map"><a ng-href="#map"><span class="glyphicon glyphicon-map-marker"></span><span class="text"> Map</span></a></li>
+          <li ng-class="{'active':route === '/newpost'}" class="new"><a ng-href="#newpost"><span class="glyphicon glyphicon-pushpin"></span><span class="text"> Create post</span></a></li>
+          <li ng-class="{'active':route === '/settings'}"><a ng-href="#settings"><span class="glyphicon glyphicon-cog"></span><span class="text"> Settings</span></a></li>
         </ul>
       </div>
 
-      <div ng-view class="fancylook"></div>
+      <div ng-view></div>
 
+      <div class="col-lg-12 liner"></div>
       <div class="footer">
         <p class="pull-left">BSc Thesis Project</p>
         <p class="pull-right"><span class="glyphicon glyphicon-wrench"></span> by Denis Kuliček</p>

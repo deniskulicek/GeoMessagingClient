@@ -7,6 +7,7 @@
 3. Add by ...
 
 *********/
+
 var serverAddress = 'https://ftn-13190.onmodulus.net';
 
 var app = angular.module('geoLocationMessagingClientApp', ['ngRoute']);
@@ -18,15 +19,43 @@ app.config(['$routeProvider',
 				templateUrl: 'views/posts.html',
 				controller: 'PostsListController'
 			}).
-			when('/newPost', {
-				templateUrl: 'views/newPost.html',
+			when('/map', {
+				templateUrl: 'views/map.html',
+				controller: ''
+			}).
+			when('/newpost', {
+				templateUrl: 'views/newpost.html',
 				controller: 'NewPostController'
+			}).
+			when('/settings', {
+				templateUrl: 'views/settings.html',
+				controller: ''
 			}).
 			otherwise({
 				redirectTo: '/'
 			});
 	}
 ]);
+
+app.controller('mainCtrl', ['$scope', '$rootScope', '$location',
+
+	function($scope, $rootScope, $location){
+		$scope.settings = {
+			sampleData: false
+		};
+
+		$scope.route = 'posts';
+
+		$rootScope.$on('$routeChangeSuccess', function() {
+			$scope.route = $location.path();
+			console.log($scope.route);
+		});
+	}
+
+]);
+
+app.$inject = ['$rootScope', '$location'];
+
 
 app.service('locationService',
 	function(){
@@ -106,7 +135,7 @@ app.service('dataService', ['$http', 'locationService',
 app.controller('PostsListController', ['$scope', '$interval', '$q', 'dataService',
 	function($scope, $interval, $q, dataService){
 		$scope.posts = null;
-		$scope.feedback = 'Loading... (Please allow using GPS location on your device)';
+		$scope.feedback = 'Loading... (Please make sure GPS is enabled on your device)';
 
 		$scope.onReload = function(){
 			console.warn('reloading');
