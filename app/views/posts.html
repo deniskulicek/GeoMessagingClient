@@ -5,7 +5,7 @@
 <div class="col-lg-12">
   <div class="row post" ng-repeat="post in posts">
     <div class="text">
-      <div class="distance">{{post.distance}}</div>
+      <div class="distance" data-container="body" data-html="true" data-toggle="popover" data-placement="top" data-content="Location: {{post.loc.coordinates[1]}},{{post.loc.coordinates[0]}}&nbsp;<br><a target='_blank' href='https://www.google.com/maps/@45.1103125,20.6287984,16z'>see on google map</a>">{{post.distance}}</div>
       <p>{{post.message}}</p>
     </div>
     <div class="info">

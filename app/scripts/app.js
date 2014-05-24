@@ -45,24 +45,32 @@ app.controller('mainCtrl', ['$scope', '$rootScope', '$location', '$cookies', 'lo
 
 	function($scope, $rootScope, $location, $cookies, locationService){
 
-		console.log($cookies.username);
-
-		//if username is not set, set it for the first time...
+		//initial cookie settings (will keep settings for current session)
 		if($cookies.username === undefined){
 			$cookies.username = 'Anonymous'+Math.round(Math.random()*10000);
+			$cookies.sampledata = false;
 		}
 
 		$scope.settings = {
 			username: $cookies.username,
-			sampleData: false
+			sampleData: $cookies.sampledata === 'true'
 		};
 
-		$scope.route = 'posts';
+		$scope.changePostsPath = function(){
+			if($scope.settings.sampleData === true){
+				postsPath = '/sampleposts';
+			} else {
+				postsPath = '/posts';
+			}
+		};
+
+		$scope.changePostsPath();
+
 		$scope.address = '';
 
-		locationService.getAddress(function(data){
+		locationService.getAddress(function(data, coords){
 			if(data.status === 'OK'){
-				$scope.address = data.results[0].formatted_address;
+				$scope.address = data.results[0].formatted_address + ' (Accuracy: '+coords.accuracy+'m)';
 			} else {
 				$scope.address = 'Couldn\'t locate you.';
 			}
@@ -70,7 +78,6 @@ app.controller('mainCtrl', ['$scope', '$rootScope', '$location', '$cookies', 'lo
 
 		$rootScope.$on('$routeChangeSuccess', function() {
 			$scope.route = $location.path();
-			console.log($scope.route);
 		});
 
 		$scope.$on('LOAD_START', function(){
@@ -103,8 +110,7 @@ app.service('locationService', ['$http',
 			function success(pos) {
 				coords = pos.coords;
 
-				console.log('Your current position is: [' + coords.longitude + ', ' + coords.latitude + ']');
-				console.log('More or less ' + coords.accuracy + ' meters.');
+				console.log('Your current position is: [' + coords.longitude + ', ' + coords.latitude + ']' + ' Accuracy: '+coords.accuracy +' m');
 				callback(coords);
 			}
 
@@ -147,7 +153,7 @@ app.service('locationService', ['$http',
 					url: geoLocationServiceAddress + 'latlng=' + coords.latitude + ',' + coords.longitude + '&sensor=true'
 				}).
 				success(function(data){
-					callback(data);
+					callback(data, coords);
 				}).
 				error(function(){
 					console.log('error');
@@ -179,7 +185,7 @@ app.service('dataService', ['$http', 'locationService',
 					callbackFunc(data, scope);
 				}).
 				error(function(){
-					console.log('error');
+					scope.$emit('ERROR', 'Error fetching data from server.');
 				});
 
 			}, scope);
@@ -197,6 +203,10 @@ app.controller('PostsListController', ['$scope', '$interval', '$q', 'dataService
 		$scope.onReload = function(){
 			console.warn('reloading');
 		};
+
+		$scope.$on('ERROR', function(msg){
+			console.log(msg);
+		});
 
 		function loadData(){
 			$scope.$emit('LOAD_START');
@@ -282,7 +292,8 @@ app.controller('NewPostController', ['$scope', '$http', 'locationService',
 				data: {
 					message: $scope.message,
 					longitude: $scope.loc.longitude,
-					latitude: $scope.loc.latitude
+					latitude: $scope.loc.latitude,
+					device_id: $scope.settings.username
 				}
 			}).
 			success(function(){//data pa proveriti sta je stvarno vratio server
@@ -301,8 +312,10 @@ app.controller('SettingsController', ['$scope', '$cookies', function($scope, $co
 	});
 
 	$scope.$watch('settings.sampleData', function(){
-		console.log('using sample data');
-		postsPath = '/sampleposts';
+
+		$cookies.sampledata = $scope.settings.sampleData;
+		$scope.changePostsPath();
+		
 	});
 
 }]);
