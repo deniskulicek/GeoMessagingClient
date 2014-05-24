@@ -16,10 +16,15 @@
       </span>
     </div>
   </div>
+  <div class="row">
+    <div class="col-lg-1 col-centered loadbar">
+      <img ng-class="{'hidden':loading == false}" src="images/ajax-loader.gif" />
+    </div>
+  </div>
 </div>
-<div class="col-lg-12" ng-if="posts">
+<div class="col-lg-12">
   <ul class="pager">
-    <li class="previous"><a ng-click="getCloser()">&larr; Closer</a></li>
-    <li class="next"><a ng-click="getFurther()">Further &rarr;</a></li>
+    <li ng-class="{'disabled':page == 1}" class="previous"><a ng-click="getCloser()">&larr; Closer</a></li>
+    <li ng-class="{'disabled':posts.length < 5}" class="next"><a ng-click="getFurther()">Further &rarr;</a></li>
   </ul>
 </div>

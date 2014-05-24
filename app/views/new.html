@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="col-lg-12">
 		<form novalidate class="simple-form">
-			<textarea class="form-control" type="text" rows="4" ng-model="message"></textarea><br>
+			<textarea class="form-control" type="text" rows="4" ng-model="message" maxlength="140"></textarea><br>
 			<small ng:class="{true:'hidden', false:''}[enabled]">{{feedback}}</small>
 			<button class="btn btn-submit pull-right" ng-disabled="!enabled" ng-click="send()">Pin it! <span class="glyphicon glyphicon-pushpin"></span></button>
 		</form>

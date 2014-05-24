@@ -9,6 +9,8 @@
 *********/
 
 var serverAddress = 'https://ftn-13190.onmodulus.net';
+var geoLocationServiceAddress = 'https://maps.googleapis.com/maps/api/geocode/json?';
+var POSTS_PER_PAGE = 5;
 
 var app = angular.module('geoLocationMessagingClientApp', ['ngRoute']);
 
@@ -21,7 +23,7 @@ app.config(['$routeProvider',
 			}).
 			when('/map', {
 				templateUrl: 'views/map.html',
-				controller: ''
+				controller: 'MapsController'
 			}).
 			when('/new', {
 				templateUrl: 'views/new.html',
@@ -37,18 +39,35 @@ app.config(['$routeProvider',
 	}
 ]);
 
-app.controller('mainCtrl', ['$scope', '$rootScope', '$location',
+app.controller('mainCtrl', ['$scope', '$rootScope', '$location', 'locationService',
 
-	function($scope, $rootScope, $location){
+	function($scope, $rootScope, $location, locationService){
 		$scope.settings = {
 			sampleData: false
 		};
 
 		$scope.route = 'posts';
+		$scope.address = '';
+
+		locationService.getAddress(function(data){
+			if(data.status === 'OK'){
+				$scope.address = data.results[0].formatted_address;
+			} else {
+				$scope.address = 'Couldn\'t locate you.';
+			}
+		});
 
 		$rootScope.$on('$routeChangeSuccess', function() {
 			$scope.route = $location.path();
 			console.log($scope.route);
+		});
+
+		$scope.$on('LOAD_START', function(){
+			$scope.loading = true;
+		});
+
+		$scope.$on('LOAD_END', function(){
+			$scope.loading = false;
 		});
 	}
 
@@ -57,14 +76,14 @@ app.controller('mainCtrl', ['$scope', '$rootScope', '$location',
 app.$inject = ['$rootScope', '$location'];
 
 
-app.service('locationService',
-	function(){
+app.service('locationService', ['$http',
+	function($http){
 
 		var coords = null;
 
 		var options = {
 		  enableHighAccuracy: true,
-		  timeout: 5000,
+		  timeout: 30000, /* make it 30sec, GPS cannot find location quickly */
 		  maximumAge: 0
 		};
 
@@ -96,14 +115,38 @@ app.service('locationService',
 				scope.$apply();
 			}
 
+			//always ping for new location (no cache for accuracy)
+			navigator.geolocation.getCurrentPosition(success, error, options);
+
+			/*
 			if(coords === null){
 				navigator.geolocation.getCurrentPosition(success, error, options);
 			} else {
 				callback(coords);
 			}
+			*/
+		};
+
+		this.getAddress = function(callback){
+
+			this.getLocation(function(coords){
+
+				$http({
+					method: 'GET',
+					url: geoLocationServiceAddress + 'latlng=' + coords.latitude + ',' + coords.longitude + '&sensor=true'
+				}).
+				success(function(data){
+					callback(data);
+				}).
+				error(function(){
+					console.log('error');
+				});
+
+			}, this);
+			
 		};
 	}
-);
+]);
 
 app.service('dataService', ['$http', 'locationService',
 	function($http, locationService) {
@@ -116,7 +159,8 @@ app.service('dataService', ['$http', 'locationService',
 					url: serverAddress + '/posts',
 					data: {
 						longitude: loc.longitude,
-						latitude: loc.latitude
+						latitude: loc.latitude,
+						page: scope.page
 					}
 				}).
 				success(function(data){
@@ -134,20 +178,28 @@ app.service('dataService', ['$http', 'locationService',
 
 app.controller('PostsListController', ['$scope', '$interval', '$q', 'dataService',
 	function($scope, $interval, $q, dataService){
-		$scope.posts = null;
+		$scope.posts = [];
+		$scope.page = 1;
 		$scope.feedback = 'Loading... (Please make sure GPS is enabled on your device)';
 
+		//TODO - pull to refresh
 		$scope.onReload = function(){
 			console.warn('reloading');
 		};
 
-		dataService.getData(function(response){
-			$scope.posts = response;
-			$scope.feedback = '';
-			calculateMeters();
-			updateMoment();
-			$interval(updateMoment, 60000, 0, false);
-		}, $scope);
+		function loadData(){
+			$scope.$emit('LOAD_START');
+			dataService.getData(function(response){
+				$scope.posts = response;
+				$scope.feedback = '';
+				$scope.$emit('LOAD_END');
+				calculateMeters();
+				updateMoment();
+				$interval(updateMoment, 60000, 0, false);
+			}, $scope);
+		}
+
+		loadData();
 
 		function calculateMeters(){
 			angular.forEach($scope.posts, function(post){
@@ -168,11 +220,20 @@ app.controller('PostsListController', ['$scope', '$interval', '$q', 'dataService
 		}
 
 		$scope.getCloser = function(){
-			console.log('fetching closer messages');
+			if($scope.page > 1){
+				$scope.page--;
+				loadData();
+			}
+			console.log('Page: ',$scope.page);
 		};
 
 		$scope.getFurther = function(){
-			console.log('fetching more distant messages');
+			if($scope.posts.length === POSTS_PER_PAGE){
+				$scope.page++;
+				loadData();
+			}
+			console.log('Page: ',$scope.page);
+			console.log($scope.posts);
 		};
 	}
 ]);
@@ -182,6 +243,7 @@ app.controller('NewPostController', ['$scope', '$http', 'locationService',
 		$scope.enabled = false;
 		$scope.feedback = 'Waiting for location data...';
 		$scope.loc = null;
+		$scope.message = '';
 
 		locationService.getLocation(function(loc){
 			$scope.loc = loc;
@@ -192,6 +254,13 @@ app.controller('NewPostController', ['$scope', '$http', 'locationService',
 		}, $scope);
 
 		$scope.send = function(){
+			if($scope.message === ''){
+				$scope.feedback = 'Please enter message...';
+				if(!$scope.$$phase){ //if angular digest not in progress
+					$scope.$apply();
+				}
+				return false;
+			}
 			$scope.feedback = 'Sending...';
 			$scope.enabled = false;
 			
@@ -212,3 +281,19 @@ app.controller('NewPostController', ['$scope', '$http', 'locationService',
 		};
 	}
 ]);
+
+app.controller('MapsController', ['$scope', function($scope){
+
+	$scope.centerProperty = {
+		lat: 45,
+		lng: -73
+	};
+
+	$scope.zoomProperty = 8;
+	$scope.markersProperty = [ {
+			latitude: 45,
+			longitude: -74
+		}];
+	$scope.clickedLatitudeProperty = null;
+	$scope.clickedLongitudeProperty = null;
+}]);
