@@ -9,7 +9,7 @@
       <p>{{post.message}}</p>
     </div>
     <div class="info">
-      <span>{{post.moment}}</span>
+      <span>{{post.moment}}<span ng-if="post.device_id != null">&nbsp;by {{post.device_id}}</span></span>
       <span class="pull-right">
         <button><span class="glyphicon glyphicon-thumbs-up"></span> ({{post.upvotes}})</button>
         <button><span class="glyphicon glyphicon-thumbs-down"></span> ({{post.downvotes}})</button>
