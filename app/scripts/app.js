@@ -8,7 +8,7 @@
 
 *********/
 
-var serverAddress = 'https://ftn-13190.onmodulus.net'; //'http://localhost:3000'; dev
+var serverAddress = 'https://ftn-13190.onmodulus.net'; //  'http://localhost:3000'; dev
 var postsPath = '/posts'; //based on useSampleData value
 
 var geoLocationServiceAddress = 'https://maps.googleapis.com/maps/api/geocode/json?';
