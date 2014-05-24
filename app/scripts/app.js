@@ -9,10 +9,12 @@
 *********/
 
 var serverAddress = 'https://ftn-13190.onmodulus.net';
+var postsPath = '/posts'; //based on useSampleData value
+
 var geoLocationServiceAddress = 'https://maps.googleapis.com/maps/api/geocode/json?';
 var POSTS_PER_PAGE = 5;
 
-var app = angular.module('geoLocationMessagingClientApp', ['ngRoute']);
+var app = angular.module('geoLocationMessagingClientApp', ['ngRoute', 'ngCookies']);
 
 app.config(['$routeProvider',
 	function($routeProvider) {
@@ -31,7 +33,7 @@ app.config(['$routeProvider',
 			}).
 			when('/settings', {
 				templateUrl: 'views/settings.html',
-				controller: ''
+				controller: 'SettingsController'
 			}).
 			otherwise({
 				redirectTo: '/'
@@ -39,10 +41,19 @@ app.config(['$routeProvider',
 	}
 ]);
 
-app.controller('mainCtrl', ['$scope', '$rootScope', '$location', 'locationService',
+app.controller('mainCtrl', ['$scope', '$rootScope', '$location', '$cookies', 'locationService',
 
-	function($scope, $rootScope, $location, locationService){
+	function($scope, $rootScope, $location, $cookies, locationService){
+
+		console.log($cookies.username);
+
+		//if username is not set, set it for the first time...
+		if($cookies.username === undefined){
+			$cookies.username = 'Anonymous'+Math.round(Math.random()*10000);
+		}
+
 		$scope.settings = {
+			username: $cookies.username,
 			sampleData: false
 		};
 
@@ -156,7 +167,7 @@ app.service('dataService', ['$http', 'locationService',
 			locationService.getLocation(function(loc){
 				$http({
 					method: 'POST',
-					url: serverAddress + '/posts',
+					url: serverAddress + postsPath,
 					data: {
 						longitude: loc.longitude,
 						latitude: loc.latitude,
@@ -203,12 +214,13 @@ app.controller('PostsListController', ['$scope', '$interval', '$q', 'dataService
 
 		function calculateMeters(){
 			angular.forEach($scope.posts, function(post){
-				var measuringUnit = 'm';
-				if(post.distance > 1000){
-					post.distance /= 1000;
-					measuringUnit = 'km';
+
+				if(post.distance < 1000){
+					post.distance = Math.round(post.distance) + ' m';
+				} else {
+					post.distance /= 10;
+					post.distance = Math.round(post.distance) / 100 + ' km';
 				}
-				post.distance = Math.round(post.distance, 1) + ' ' + measuringUnit;
 				
 			});
 		}
@@ -281,6 +293,19 @@ app.controller('NewPostController', ['$scope', '$http', 'locationService',
 		};
 	}
 ]);
+
+app.controller('SettingsController', ['$scope', '$cookies', function($scope, $cookies){
+
+	$scope.$watch('settings.username', function(){
+		$cookies.username = $scope.settings.username;
+	});
+
+	$scope.$watch('settings.sampleData', function(){
+		console.log('using sample data');
+		postsPath = '/sampleposts';
+	});
+
+}]);
 
 app.controller('MapsController', ['$scope', function($scope){
 

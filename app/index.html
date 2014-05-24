@@ -26,7 +26,7 @@
     <div class="container" ng-controller="mainCtrl">
       <div class="header">
         <h3 class="text-muted">Geo MSG&nbsp</h3>
-        <p ng-if="address != ''"><span class="glyphicon glyphicon-screenshot"></span>&nbsp{{address}}</p>
+        <p><span ng-if="address != ''" class="glyphicon glyphicon-screenshot"></span>&nbsp{{address}}</p>
         <ul class="nav nav-justified nav-pills menu">
           <li ng-class="{'active':route === '/'}" class="posts"><a ng-href="/"><span class="glyphicon glyphicon-home"></span><span class="text">&nbsp;Posts</span></a></li>
           <li ng-class="{'active':route === '/map'}" class="map"><a ng-href="#map"><span class="glyphicon glyphicon-map-marker"></span><span class="text">&nbsp;Map</span></a></li>
@@ -63,19 +63,17 @@
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
-    <script src="bower_components/jquery/jquery.js"></script>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/momentjs/moment.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
-        <script src="http://maps.googleapis.com/maps/api/js?sensor=false&language=en"></script>
-        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/0.10.0/lodash.min.js"></script>
-        <script src="scripts/angular-google-maps.min.js"></script>
         <!-- endbuild -->
 </body>
 </html>
