@@ -80,8 +80,9 @@
     
     <script>
       function onGoogleReady() {
-        console.log('google-ready');
-        $.getScript("custom/markerwithlabel_packed.js", function(){console.log('loaded lib');});
+        $.getScript("custom/markerwithlabel_packed.js", function(){
+          MarkerClusterer.IMAGE_PATH = "https://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclustererplus/images/m";
+        });
         angular.bootstrap(document.getElementById("app"), ['geoLocationMessagingClientApp']);
       }
     </script>

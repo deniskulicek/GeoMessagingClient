@@ -113,7 +113,7 @@ app.service('locationService', ['$http',
 			function success(pos) {
 				coords = pos.coords;
 				
-				console.log('Your current position is: [' + coords.longitude + ', ' + coords.latitude + ']' + ' Accuracy: '+coords.accuracy +' m');
+				//console.log('Your current position is: [' + coords.longitude + ', ' + coords.latitude + ']' + ' Accuracy: '+coords.accuracy +' m');
 				callback(coords);
 			}
 
@@ -326,7 +326,6 @@ app.controller('SettingsController', ['$scope', '$cookies', function($scope, $co
 
 app.controller('MapsController', ['$scope', '$http', 'locationService', function($scope, $http, locationService){
 
-	console.log('loading maps controller', $scope.mapOptions);
 /*
 	$scope.mapOptions = {
       center: new google.maps.LatLng(45.2530032, 19.8262524),

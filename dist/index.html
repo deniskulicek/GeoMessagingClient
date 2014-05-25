@@ -10,7 +10,8 @@
     <script src="bower_components/es5-shim/es5-shim.js"></script>
     <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]--><script src="scripts/761ad341.vendor.js"></script><script type="text/javascript" src="custom/markerclusterer_packed.js"></script><script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.15&sensor=false&callback=onGoogleReady"></script><script>function onGoogleReady() {
-        console.log('google-ready');
-        $.getScript("custom/markerwithlabel_packed.js", function(){console.log('loaded lib');});
+        $.getScript("custom/markerwithlabel_packed.js", function(){
+          MarkerClusterer.IMAGE_PATH = "https://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclustererplus/images/m";
+        });
         angular.bootstrap(document.getElementById("app"), ['geoLocationMessagingClientApp']);
-      }</script><script src="scripts/de994807.scripts.js"></script>
+      }</script><script src="scripts/f0c5228c.scripts.js"></script>
