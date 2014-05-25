@@ -340,7 +340,7 @@ app.controller('MapsController', ['$scope', '$http', 'locationService', function
 			//set initial options
 			$scope.myMap.setOptions({
 				center: new google.maps.LatLng(coords.latitude, coords.longitude),
-				zoom: 18,
+				zoom: 15,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 			});
 
