@@ -10,8 +10,8 @@
 
 *********/
 
-var serverAddress = 'https://ftn-13190.onmodulus.net'; //  'http://localhost:3000'; dev
-var postsPath = '/posts'; //based on useSampleData value
+var serverAddress = 'https://ftn-13190.onmodulus.net'; // dev: 'http://localhost:3000';
+var urlquery = ''; //based on useSampleData value
 
 var geoLocationServiceAddress = 'https://maps.googleapis.com/maps/api/geocode/json?';
 var POSTS_PER_PAGE = 5;
@@ -60,9 +60,9 @@ app.controller('mainCtrl', ['$scope', '$rootScope', '$location', '$cookies', 'lo
 
 		$scope.changePostsPath = function(){
 			if($scope.settings.sampleData === true){
-				postsPath = '/sampleposts';
+				urlquery = '?sampleflag';
 			} else {
-				postsPath = '/posts';
+				urlquery = '';
 			}
 		};
 
@@ -176,7 +176,7 @@ app.service('dataService', ['$http', 'locationService',
 			locationService.getLocation(function(loc){
 				$http({
 					method: 'POST',
-					url: serverAddress + postsPath,
+					url: serverAddress + '/posts' +urlquery,
 					data: {
 						longitude: loc.longitude,
 						latitude: loc.latitude,
@@ -324,7 +324,7 @@ app.controller('SettingsController', ['$scope', '$cookies', function($scope, $co
 
 }]);
 
-app.controller('MapsController', ['$scope', 'locationService', function($scope, locationService){
+app.controller('MapsController', ['$scope', '$http', 'locationService', function($scope, $http, locationService){
 
 	console.log('loading maps controller', $scope.mapOptions);
 /*
@@ -345,11 +345,13 @@ app.controller('MapsController', ['$scope', 'locationService', function($scope, 
 			});
 
 			//add you are here marker
+			var image = 'images/marker-blue.png';
 			$scope.you = new google.maps.Marker({
 				position: new google.maps.LatLng(coords.latitude, coords.longitude),
 				map: $scope.myMap,
 				title: 'You are here!',
-				animation: google.maps.Animation.DROP
+				animation: google.maps.Animation.DROP,
+				icon: image
 			});
 
 			google.maps.event.addListener($scope.myMap, 'idle', function(){
@@ -370,10 +372,69 @@ app.controller('MapsController', ['$scope', 'locationService', function($scope, 
 					lat: sw.lat
 				};
 
-				console.log('Bounds: ',ne,nw,se,sw);
+				$scope.getPointsWithin(ne,nw,sw,se);
 			});
 			
 		}
 	}, $scope);
+
+	$scope.getPointsWithin = function(ne,nw,sw,se){
+
+		$http({
+			method: 'POST',
+			url: serverAddress + '/posts/within' + urlquery,
+			data: {
+				points: [
+					[
+						[
+							ne.long,
+							ne.lat
+						],
+						[
+							nw.long,
+							ne.lat
+						],
+						[
+							sw.long,
+							sw.lat
+						],
+						[
+							se.long,
+							se.lat
+						],
+						[
+							ne.long,
+							ne.lat
+						]
+					]
+				]
+			}
+		}).
+		success(function(data){
+			$scope.populateMap(data);
+		}).
+		error(function(){
+			console.log('Couldn\'t  fetch data.');
+		});
+
+	};
+
+	$scope.populateMap = function(points) {
+		
+		var markers = [];
+		var mcOptions = {gridSize: 50, maxZoom: 15};
+		points.forEach(function(p){
+			var latlng = new google.maps.LatLng(p.loc.coordinates[1], p.loc.coordinates[0]);
+			var marker = new google.maps.Marker({
+				position: latlng,
+				map: $scope.myMap,
+				title: p.message
+			});
+			markers.push(marker);
+			//console.log('added: ',latlng);
+		});
+		var cluster = new MarkerClusterer($scope.myMap, markers, mcOptions);
+
+	};
 
 }]);
