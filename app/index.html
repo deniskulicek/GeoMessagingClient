@@ -76,13 +76,13 @@
     <script src="bower_components/angular-ui-map/ui-map.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
-    <script type="text/javascript" src="scripts/markerclusterer_packed.js"></script>
+    <script type="text/javascript" src="custom/markerclusterer_packed.js"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.15&sensor=false&callback=onGoogleReady"></script>
     
     <script>
       function onGoogleReady() {
         console.log('google-ready');
-        $.getScript("scripts/markerwithlabel_packed.js", function(){console.log('loaded lib');});
+        $.getScript("custom/markerwithlabel_packed.js", function(){console.log('loaded lib');});
         angular.bootstrap(document.getElementById("app"), ['geoLocationMessagingClientApp']);
       }
     </script>

@@ -345,7 +345,7 @@ app.controller('MapsController', ['$scope', '$http', 'locationService', function
 			});
 
 			//add you are here marker
-			var image = 'images/marker-blue.png';
+			var image = 'custom/marker-blue.png';
 			$scope.you = new google.maps.Marker({
 				position: new google.maps.LatLng(coords.latitude, coords.longitude),
 				map: $scope.myMap,
