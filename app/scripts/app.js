@@ -1,3 +1,5 @@
+/*global google:false */
+
 'use strict';
 
 /* TODO
@@ -14,7 +16,7 @@ var postsPath = '/posts'; //based on useSampleData value
 var geoLocationServiceAddress = 'https://maps.googleapis.com/maps/api/geocode/json?';
 var POSTS_PER_PAGE = 5;
 
-var app = angular.module('geoLocationMessagingClientApp', ['ngRoute', 'ngCookies']);
+var app = angular.module('geoLocationMessagingClientApp', ['ngRoute', 'ngCookies', 'ui.map']);
 
 app.config(['$routeProvider',
 	function($routeProvider) {
@@ -67,6 +69,7 @@ app.controller('mainCtrl', ['$scope', '$rootScope', '$location', '$cookies', 'lo
 		$scope.changePostsPath();
 
 		$scope.address = '';
+		$scope.coords = null;
 
 		locationService.getAddress(function(data, coords){
 			if(data.status === 'OK'){
@@ -109,7 +112,7 @@ app.service('locationService', ['$http',
 
 			function success(pos) {
 				coords = pos.coords;
-
+				
 				console.log('Your current position is: [' + coords.longitude + ', ' + coords.latitude + ']' + ' Accuracy: '+coords.accuracy +' m');
 				callback(coords);
 			}
@@ -269,6 +272,7 @@ app.controller('NewPostController', ['$scope', '$http', 'locationService',
 
 		locationService.getLocation(function(loc){
 			$scope.loc = loc;
+			$scope.coords = loc; //budzotina
 			$scope.enabled = true;
 			if(!$scope.$$phase){ //if angular digest not in progress
 				$scope.$apply();
@@ -320,18 +324,56 @@ app.controller('SettingsController', ['$scope', '$cookies', function($scope, $co
 
 }]);
 
-app.controller('MapsController', ['$scope', function($scope){
+app.controller('MapsController', ['$scope', 'locationService', function($scope, locationService){
 
-	$scope.centerProperty = {
-		lat: 45,
-		lng: -73
-	};
+	console.log('loading maps controller', $scope.mapOptions);
+/*
+	$scope.mapOptions = {
+      center: new google.maps.LatLng(45.2530032, 19.8262524),
+      zoom: 13,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+*/
+	locationService.getLocation(function(coords){
+		if($scope.myMap !== undefined){ //make sure map is loaded
 
-	$scope.zoomProperty = 8;
-	$scope.markersProperty = [ {
-			latitude: 45,
-			longitude: -74
-		}];
-	$scope.clickedLatitudeProperty = null;
-	$scope.clickedLongitudeProperty = null;
+			//set initial options
+			$scope.myMap.setOptions({
+				center: new google.maps.LatLng(coords.latitude, coords.longitude),
+				zoom: 18,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			});
+
+			//add you are here marker
+			$scope.you = new google.maps.Marker({
+				position: new google.maps.LatLng(coords.latitude, coords.longitude),
+				map: $scope.myMap,
+				title: 'You are here!',
+				animation: google.maps.Animation.DROP
+			});
+
+			google.maps.event.addListener($scope.myMap, 'idle', function(){
+				var ne = {
+					long: $scope.myMap.getBounds().getNorthEast().lng(),
+					lat: $scope.myMap.getBounds().getNorthEast().lat()
+				};
+				var sw = {
+					long: $scope.myMap.getBounds().getSouthWest().lng(),
+					lat: $scope.myMap.getBounds().getSouthWest().lat()
+				};
+				var nw = {
+					long: sw.long,
+					lat: ne.lat
+				};
+				var se = {
+					long: ne.long,
+					lat: sw.lat
+				};
+
+				console.log('Bounds: ',ne,nw,se,sw);
+			});
+			
+		}
+	}, $scope);
+
 }]);
