@@ -9,6 +9,9 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <meta charset="UTF-8">
+    <meta name="author" content="Denis Kulicek">
+    <meta name="description" content="Geo Messaging App built on MEAN stack.">
+    <meta name="keywords" content="geo,messaging,MEAN,mongo,mongodb,express,geojson,angular,maps">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
@@ -73,11 +76,13 @@
     <script src="bower_components/angular-ui-map/ui-map.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
-    <script type="text/javascript" src="scripts/markerclusterer_compiled.js"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=onGoogleReady"></script>
+    <script type="text/javascript" src="scripts/markerclusterer_packed.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.15&sensor=false&callback=onGoogleReady"></script>
+    
     <script>
       function onGoogleReady() {
         console.log('google-ready');
+        $.getScript("scripts/markerwithlabel_packed.js", function(){console.log('loaded lib');});
         angular.bootstrap(document.getElementById("app"), ['geoLocationMessagingClientApp']);
       }
     </script>

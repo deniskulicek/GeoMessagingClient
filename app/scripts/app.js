@@ -419,19 +419,35 @@ app.controller('MapsController', ['$scope', '$http', 'locationService', function
 
 	};
 
+	$scope.allMarkerKeys = [];
+
 	$scope.populateMap = function(points) {
 		
 		var markers = [];
 		var mcOptions = {gridSize: 50, maxZoom: 15};
 		points.forEach(function(p){
 			var latlng = new google.maps.LatLng(p.loc.coordinates[1], p.loc.coordinates[0]);
-			var marker = new google.maps.Marker({
-				position: latlng,
-				map: $scope.myMap,
-				title: p.message
-			});
-			markers.push(marker);
-			//console.log('added: ',latlng);
+			
+			if($scope.allMarkerKeys.indexOf(p._id) === -1){
+
+				var by = (p.device_id !== undefined)?'<br>by '+p.device_id:'';
+				var msg = p.message.replace(/(?:\r\n|\r|\n)/g, '<br />');
+
+				var marker = new MarkerWithLabel({
+					position: latlng,
+					draggable: false,
+					map: $scope.myMap,
+					labelContent: msg + by,
+					labelAnchor: new google.maps.Point(22,0),
+					labelClass: 'label'
+				});
+				markers.push(marker);
+				$scope.allMarkerKeys.push(p._id);
+				//console.log('Dont have it adding:',p._id);
+			} else {
+				//console.log('XXXXXX',p._id);
+			}
+
 		});
 		var cluster = new MarkerClusterer($scope.myMap, markers, mcOptions);
 
