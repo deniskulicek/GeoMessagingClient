@@ -4,9 +4,8 @@
 
 /* TODO
 
-1. Cache location (1st time?) - mainCtrl
+1. Use LocalStorage?
 2. Message sent, fix to be able to post more.
-3. Add by ...
 
 *********/
 
